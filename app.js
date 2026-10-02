@@ -2,7 +2,7 @@ const express = require("express");
 
 const app = express();
 app.use(express.json());
-const users = [
+let users = [
     { id: 1, name: "John" },
     { id: 2, name: "Jane" }
 ];
@@ -69,6 +69,21 @@ app.put("/users/:id", (req, res)=>{
             user.name=name;
             res.json(user);
         })
+
+app.delete("/users/:id", (req, res) => {
+    const id = Number(req.params.id);
+
+    const user = users.find(u => u.id === id);
+
+    if (!user) {
+        res.status(404).send("User not found");
+        return;
+    }
+
+    users = users.filter(u => u.id !== id);
+
+    res.status(200).send("User deleted successfully");
+});
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
