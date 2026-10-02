@@ -1,7 +1,7 @@
 const express = require("express");
 
 const app = express();
-
+app.use(express.json());
 const users = [
     { id: 1, name: "John" },
     { id: 2, name: "Jane" }
@@ -41,6 +41,17 @@ app.get("/users/:id", (req, res) => {
     res.json(user);
 });
 
+
+app.post("/users", (req, res)=>{
+    const {name}=req.body;
+    if(!name){
+        res.status(400).send("Name is required");
+        return;
+    }
+    const newUser ={id: users.length + 1, name};
+    users.push(newUser);
+    res.status(201).json(newUser);
+})
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
