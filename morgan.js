@@ -4,13 +4,24 @@ const crypto=require("crypto");
 const app=express();
 const port=3000;
 
+const reqId=((req,res,next)=>{
+    req.requestId=crypto.randomUUID();
+    next();
+    
+})
 
-app.use(morgan("dev"));
+
+
+morgan.token("id",(req)=>{
+    return req.requestId
+})
+app.use(reqId)
+app.use(morgan(":id :method :url :status :response-time ms"));
 app.use(express.json());
 
-app.use((req,res,next)=>{
-    const ID=req.requestId=crypto.randomUUID();
-    console.log(ID)
+const validation=((req,res,next)=>{
+    
+    
     const {name}=req.query;
     
     if(!name){
@@ -18,10 +29,14 @@ app.use((req,res,next)=>{
         return
     }
     next()
-});
-app.get("/user",(req,res)=>{
-
-    res.json({name:req.query.name,reqestId:req.requestId})
 })
+
+
+app.get("/user",validation,(req,res)=>{
+
+    res.json({name:req.query.name,requestId:req.requestId})
+})
+
+
 
 app.listen(port,()=>{console.log("Server is Running on port",port)})
