@@ -1,36 +1,25 @@
-const express = require("express");
-const app = express();
+const express=require("express");
+const app=express()
+app.get("/practice",(req,res,next)=>{
+    const err=new Error("Practice Error Occurred");
+    err.statusCode=400
+    next(err)
 
-const validation = (req, res, next) => {
-    const { name } = req.query;
+})
+app.use((req,res,next)=>{
+    const err=new Error("Route not found");
+    err.statusCode=404;
+    next(err);
+})
 
-    if (!name) {
-        const err = new Error("Name is required");
-        err.statusCode = 400;
-        return next(err);
-    }
-
-    if (!/^[A-Za-z]+$/.test(name)) {
-        const err = new Error("Name must contain only letters");
-        err.statusCode = 400;
-        return next(err);
-    }
-
-    next();
-};
-
-app.get("/user", validation, (req, res) => {
-    res.send(`Hello ${req.query.name}`);
+app.use((err,req,res,next)=>{
+    const statusCode=err.statusCode;
+    res.status(statusCode).json({
+        sucess:false,
+        message:err.message
+    })
 });
 
-app.use((err, req, res, next) => {
-    console.log("ERROR OBJECT:", err);
-    console.log("STATUS CODE:", err.statusCode);
-    console.log("MESSAGE:", err.message);
-
-    res.status(err.statusCode).send(err.message);
-});
-
-app.listen(3000, () => {
-    console.log("Server is running on the port 3000");
+app.listen(3000,()=>{
+    console.log("Server is running on port 3000");
 });
